@@ -59,6 +59,11 @@ canvas.addEventListener("click", (e) => {
       level++;
       message = "Keep clicking!";
       setTimeout(() => (message = ""), 3000);
+
+      // Celebration at level 3
+      if (level === 3) {
+        celebrate();
+      }
     }
 
     // Handle black ball color switch at level 3
@@ -123,6 +128,35 @@ function draw() {
   messageElement.textContent = message;
 
   requestAnimationFrame(draw);
+}
+
+// Celebration animation at level 3
+function celebrate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw bright red screen
+  ctx.fillStyle = "red";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw cats with fireworks
+  ctx.font = "40px Arial";
+  ctx.fillStyle = "white";
+  ctx.textAlign = "center";
+  ctx.fillText("😺", canvas.width / 4, canvas.height / 2 - 30); // Wide-eyed cat
+  ctx.fillText("💥", 3 * canvas.width / 4, canvas.height / 2 - 30); // Exploding cat
+
+  // Light show
+  for (let i = 0; i < 50; i++) {
+    ctx.fillStyle = `hsl(${Math.random() * 360}, 100%, 50%)`;
+    ctx.beginPath();
+    ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 5 + 1, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Reset after 6 seconds
+  setTimeout(() => {
+    draw();
+  }, 6000);
 }
 
 draw();
