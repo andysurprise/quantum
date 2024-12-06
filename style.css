@@ -10,3 +10,10 @@ canvas {
   margin: 20px auto;
   display: block;
 }
+
+#fact {
+  font-size: 18px;
+  color: darkblue;
+  font-style: italic;
+  margin-top: 10px;
+}
