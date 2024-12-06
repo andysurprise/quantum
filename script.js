@@ -1,4 +1,4 @@
-// JavaScript File for Quantum Mechanics Clicker Game
+// JavaScript for Quantum Mechanics Clicker Game
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -10,30 +10,32 @@ let level = 1;
 let message = "";
 let inCelebration = false;
 
+// Ball data
 const redBalls = [
   { x: 200, y: 200, radius: 20, color: "red", displayX: 200, displayY: 200 },
 ];
 const greyBall = { x: 100, y: 100, radius: 15, color: "grey", dx: 2, dy: 2 };
 const blackBall = { x: 300, y: 300, radius: 20, color: "black" };
 
-// Randomize position for a ball
+// Randomize position of a ball
 function randomizeBallPosition(ball) {
   ball.x = Math.random() * (canvas.width - ball.radius * 2) + ball.radius;
   ball.y = Math.random() * (canvas.height - ball.radius * 2) + ball.radius;
 }
 
-// Add wiggling effect to balls
+// Wiggle ball for frenetic movement
 function wiggleBall(ball) {
   const wiggleX = Math.random() * 10 - 5; // Random value between -5 and 5
   const wiggleY = Math.random() * 10 - 5; // Random value between -5 and 5
   return { x: ball.x + wiggleX, y: ball.y + wiggleY };
 }
 
-// Move the grey ball erratically
+// Move grey ball erratically
 function moveGreyBall() {
   greyBall.x += greyBall.dx;
   greyBall.y += greyBall.dy;
 
+  // Bounce off walls
   if (greyBall.x - greyBall.radius < 0 || greyBall.x + greyBall.radius > canvas.width) {
     greyBall.dx *= -1;
   }
@@ -42,7 +44,7 @@ function moveGreyBall() {
   }
 }
 
-// Play celebration animation
+// Celebration animation
 function playCelebration() {
   inCelebration = true;
   let progress = 0;
@@ -54,11 +56,13 @@ function playCelebration() {
   const animation = setInterval(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Fade-in red background
     if (progress < 100) {
       ctx.fillStyle = `rgba(255, 0, 0, ${progress / 100})`;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
+    // Display ASCII cats
     if (progress >= 20 && progress <= 80) {
       ctx.font = "16px monospace";
       ctx.fillStyle = "black";
@@ -74,6 +78,7 @@ function playCelebration() {
       ctx.fillText("   > ^ <", 250, 180);
     }
 
+    // Fireworks and random lights
     if (progress > 50) {
       for (let i = 0; i < 10; i++) {
         const x = Math.random() * canvas.width;
@@ -113,9 +118,10 @@ function draw() {
     ctx.arc(x, y, ball.radius, 0, Math.PI * 2);
     ctx.fill();
     ball.displayX = x;
-    ball.displayY = y;
+    ball.displayY = y; // Update display position for click detection
   });
 
+  // Draw grey ball (level 2+)
   if (level >= 2) {
     ctx.fillStyle = greyBall.color;
     ctx.beginPath();
@@ -123,6 +129,7 @@ function draw() {
     ctx.fill();
   }
 
+  // Draw black/green ball (level 3+)
   if (level >= 3) {
     ctx.fillStyle = blackBall.color;
     ctx.beginPath();
@@ -131,13 +138,14 @@ function draw() {
   }
 
   moveGreyBall();
+
   scoreboardElement.textContent = `Score: ${score} | Level: ${level}`;
   messageElement.textContent = message;
 
   requestAnimationFrame(draw);
 }
 
-// Handle canvas click
+// Handle clicks
 canvas.addEventListener("click", (e) => {
   if (inCelebration) return;
 
@@ -149,6 +157,7 @@ canvas.addEventListener("click", (e) => {
     if (dist <= ball.radius) {
       score++;
       randomizeBallPosition(ball);
+
       if (score % 10 === 0) {
         level++;
         message = "Keep clicking!";
@@ -170,5 +179,5 @@ canvas.addEventListener("click", (e) => {
   });
 });
 
-// Start the game
+// Start the game loop
 draw();
