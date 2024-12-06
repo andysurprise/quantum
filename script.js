@@ -54,21 +54,21 @@ canvas.addEventListener("click", (e) => {
     randomizeBallPosition(redBall);
     displayFact();
 
+    // Handle celebration after 10 clicks
+    if (score % 10 === 0) {
+      celebrate();
+    }
+
     // Handle level transitions
     if (score % 10 === 0) {
       level++;
       message = "Keep clicking!";
       setTimeout(() => (message = ""), 3000);
 
-      // Celebration at level 3
-      if (level === 3) {
-        celebrate();
+      // Handle black ball color switch at level 3
+      if (level >= 3) {
+        blackBall.color = Math.random() < 0.25 ? "green" : "black";
       }
-    }
-
-    // Handle black ball color switch at level 3
-    if (level >= 3) {
-      blackBall.color = Math.random() < 0.25 ? "green" : "black";
     }
   }
 });
@@ -130,7 +130,7 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-// Celebration animation at level 3
+// Celebration animation at level 3 or after 10 clicks
 function celebrate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
