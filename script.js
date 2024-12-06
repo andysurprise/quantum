@@ -1,125 +1,98 @@
-// JavaScript for Quantum Mechanics Clicker Game
-
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-const scoreboardElement = document.getElementById("scoreboard");
-const messageElement = document.getElementById("message");
+canvas.width = 400;
+canvas.height = 400;
 
+// Ball properties
+let redBall = { x: 200, y: 200, radius: 20, color: "red" };
+let greyBall = { x: 100, y: 100, radius: 15, color: "grey", dx: 3, dy: 2 };
+let blackBall = { x: 300, y: 300, radius: 15, color: "black" };
 let score = 0;
 let level = 1;
 let message = "";
-let inCelebration = false;
-
-// Ball data
-const redBalls = [
-  { x: 200, y: 200, radius: 20, color: "red", displayX: 200, displayY: 200 },
+const quantumFacts = [
+  "Particles exist in a superposition of states until observed.",
+  "Heisenberg's uncertainty principle: You can't know position and momentum precisely.",
+  "Quantum entanglement: Two particles can influence each other instantly, no matter the distance.",
+  "Schrödinger's cat is alive and dead until observed!",
+  "Quantum tunneling allows particles to pass through barriers.",
+  "Light behaves as both a particle and a wave.",
 ];
-const greyBall = { x: 100, y: 100, radius: 15, color: "grey", dx: 2, dy: 2 };
-const blackBall = { x: 300, y: 300, radius: 20, color: "black" };
 
-// Randomize position of a ball
+const factElement = document.getElementById("fact");
+const scoreboardElement = document.getElementById("scoreboard");
+const messageElement = document.getElementById("message");
+
+// Display a random quantum fact
+function displayFact() {
+  const randomFact = quantumFacts[Math.floor(Math.random() * quantumFacts.length)];
+  factElement.textContent = randomFact;
+  setTimeout(() => (factElement.textContent = ""), 3000);
+}
+
+// Randomize ball position
 function randomizeBallPosition(ball) {
-  ball.x = Math.random() * (canvas.width - ball.radius * 2) + ball.radius;
-  ball.y = Math.random() * (canvas.height - ball.radius * 2) + ball.radius;
+  ball.x = Math.random() * (canvas.width - 2 * ball.radius) + ball.radius;
+  ball.y = Math.random() * (canvas.height - 2 * ball.radius) + ball.radius;
 }
 
-// Wiggle ball for frenetic movement
-function wiggleBall(ball) {
-  const wiggleX = Math.random() * 10 - 5; // Random value between -5 and 5
-  const wiggleY = Math.random() * 10 - 5; // Random value between -5 and 5
-  return { x: ball.x + wiggleX, y: ball.y + wiggleY };
+// Add quantum uncertainty to balls
+function quantumUncertainty(ball) {
+  ball.x += Math.random() * 6 - 3; // Random shift in x
+  ball.y += Math.random() * 6 - 3; // Random shift in y
+  ball.x = Math.max(ball.radius, Math.min(canvas.width - ball.radius, ball.x));
+  ball.y = Math.max(ball.radius, Math.min(canvas.height - ball.radius, ball.y));
 }
 
-// Move grey ball erratically
+// Handle ball click
+canvas.addEventListener("click", (e) => {
+  const dist = Math.sqrt(
+    (e.offsetX - redBall.x) ** 2 + (e.offsetY - redBall.y) ** 2
+  );
+  if (dist <= redBall.radius) {
+    score++;
+    randomizeBallPosition(redBall);
+    displayFact();
+
+    // Handle level transitions
+    if (score % 10 === 0) {
+      level++;
+      message = "Keep clicking!";
+      setTimeout(() => (message = ""), 3000);
+    }
+
+    // Handle black ball color switch at level 3
+    if (level >= 3) {
+      blackBall.color = Math.random() < 0.25 ? "green" : "black";
+    }
+  }
+});
+
+// Move grey ball at level 2
 function moveGreyBall() {
-  greyBall.x += greyBall.dx;
-  greyBall.y += greyBall.dy;
+  if (level >= 2) {
+    greyBall.x += greyBall.dx;
+    greyBall.y += greyBall.dy;
 
-  // Bounce off walls
-  if (greyBall.x - greyBall.radius < 0 || greyBall.x + greyBall.radius > canvas.width) {
-    greyBall.dx *= -1;
-  }
-  if (greyBall.y - greyBall.radius < 0 || greyBall.y + greyBall.radius > canvas.height) {
-    greyBall.dy *= -1;
+    // Bounce off walls
+    if (greyBall.x <= greyBall.radius || greyBall.x >= canvas.width - greyBall.radius) {
+      greyBall.dx *= -1;
+    }
+    if (greyBall.y <= greyBall.radius || greyBall.y >= canvas.height - greyBall.radius) {
+      greyBall.dy *= -1;
+    }
   }
 }
 
-// Celebration animation
-function playCelebration() {
-  inCelebration = true;
-  let progress = 0;
-
-  const savedRedBalls = JSON.parse(JSON.stringify(redBalls));
-  const savedGreyBall = { ...greyBall };
-  const savedBlackBall = { ...blackBall };
-
-  const animation = setInterval(() => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Fade-in red background
-    if (progress < 100) {
-      ctx.fillStyle = `rgba(255, 0, 0, ${progress / 100})`;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    // Display ASCII cats
-    if (progress >= 20 && progress <= 80) {
-      ctx.font = "16px monospace";
-      ctx.fillStyle = "black";
-
-      // Cat with wide eyes
-      ctx.fillText("   /\\_/\\ ", 60, 140);
-      ctx.fillText("  ( o.o )", 60, 160);
-      ctx.fillText("   > ^ <", 60, 180);
-
-      // Cat with "X" eyes
-      ctx.fillText("   /\\_/\\ ", 250, 140);
-      ctx.fillText("  ( x.x )", 250, 160);
-      ctx.fillText("   > ^ <", 250, 180);
-    }
-
-    // Fireworks and random lights
-    if (progress > 50) {
-      for (let i = 0; i < 10; i++) {
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        const size = Math.random() * 5 + 5;
-        ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 1)`;
-        ctx.beginPath();
-        ctx.arc(x, y, size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    progress++;
-
-    if (progress > 100) {
-      clearInterval(animation);
-      inCelebration = false;
-      redBalls = savedRedBalls;
-      greyBall = savedGreyBall;
-      blackBall = savedBlackBall;
-      draw();
-    }
-  }, 60);
-}
-
-// Draw function
+// Render the game
 function draw() {
-  if (inCelebration) return;
-
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw wiggling red balls
-  redBalls.forEach((ball) => {
-    const { x, y } = wiggleBall(ball);
-    ctx.fillStyle = ball.color;
-    ctx.beginPath();
-    ctx.arc(x, y, ball.radius, 0, Math.PI * 2);
-    ctx.fill();
-    ball.displayX = x;
-    ball.displayY = y; // Update display position for click detection
-  });
+  // Draw red ball
+  ctx.fillStyle = redBall.color;
+  ctx.beginPath();
+  ctx.arc(redBall.x, redBall.y, redBall.radius, 0, Math.PI * 2);
+  ctx.fill();
 
   // Draw grey ball (level 2+)
   if (level >= 2) {
@@ -137,47 +110,19 @@ function draw() {
     ctx.fill();
   }
 
+  // Add quantum uncertainty to balls
+  quantumUncertainty(redBall);
+  if (level >= 2) quantumUncertainty(greyBall);
+  if (level >= 3) quantumUncertainty(blackBall);
+
+  // Update grey ball movement
   moveGreyBall();
 
+  // Update scoreboard and message
   scoreboardElement.textContent = `Score: ${score} | Level: ${level}`;
   messageElement.textContent = message;
 
   requestAnimationFrame(draw);
 }
 
-// Handle clicks
-canvas.addEventListener("click", (e) => {
-  if (inCelebration) return;
-
-  redBalls.forEach((ball) => {
-    const dist = Math.sqrt(
-      (e.offsetX - ball.displayX) ** 2 + (e.offsetY - ball.displayY) ** 2
-    );
-
-    if (dist <= ball.radius) {
-      score++;
-      randomizeBallPosition(ball);
-
-      if (score % 10 === 0) {
-        level++;
-        message = "Keep clicking!";
-        setTimeout(() => (message = ""), 3000);
-      }
-
-      if (level === 3 && redBalls.length === 1) {
-        redBalls.push({ x: 300, y: 300, radius: 20, color: "red", displayX: 300, displayY: 300 });
-      }
-
-      if (level === 3 && !inCelebration) {
-        playCelebration();
-      }
-
-      if (level >= 3) {
-        blackBall.color = Math.random() < 0.25 ? "green" : "black";
-      }
-    }
-  });
-});
-
-// Start the game loop
 draw();
