@@ -11,9 +11,20 @@ canvas {
   display: block;
 }
 
-#fact {
+#scoreboard {
+  font-size: 20px;
+  color: darkgreen;
+  margin-top: 10px;
+}
+
+#message {
   font-size: 18px;
+  color: darkorange;
+  margin: 10px 0;
+}
+
+#fact {
+  font-size: 16px;
   color: darkblue;
   font-style: italic;
-  margin-top: 10px;
 }
