@@ -5,16 +5,11 @@ canvas.height = 400;
 
 // Primary red ball properties
 let redBall = { x: 200, y: 200, radius: 20, color: "red" };
-
-// Ghost balls for superposition
-let ghostBalls = [];
-let inSuperposition = false;
-
-// Other balls and properties
 let greyBall = { x: 100, y: 100, radius: 15, color: "grey", dx: 3, dy: 2 };
 let blackBall = { x: 300, y: 300, radius: 15, color: "black" };
 let score = 0;
 let level = 1;
+let inCelebration = false; // Tracks if the celebration animation is running
 let message = "";
 const quantumFacts = [
   "Particles exist in a superposition of states until observed.",
@@ -36,68 +31,77 @@ function displayFact() {
   setTimeout(() => (factElement.textContent = ""), 3000);
 }
 
-// Create ghost balls for superposition
-function enterSuperposition() {
-  ghostBalls = [];
-  const numGhostBalls = Math.floor(Math.random() * 3) + 2; // 2–4 ghost balls
-  for (let i = 0; i < numGhostBalls; i++) {
-    ghostBalls.push({
-      x: Math.random() * (canvas.width - 2 * redBall.radius) + redBall.radius,
-      y: Math.random() * (canvas.height - 2 * redBall.radius) + redBall.radius,
-      radius: redBall.radius,
-      color: "rgba(255, 0, 0, 0.5)", // Semi-transparent red for ghost balls
-    });
-  }
-  inSuperposition = true;
-}
-
-// Collapse superposition when clicked
-function collapseSuperposition(clickedX, clickedY) {
-  let collapsed = false;
-
-  ghostBalls.forEach((ghost) => {
-    const dist = Math.sqrt((clickedX - ghost.x) ** 2 + (clickedY - ghost.y) ** 2);
-    if (dist <= ghost.radius) {
-      redBall.x = ghost.x;
-      redBall.y = ghost.y;
-      collapsed = true;
-    }
-  });
-
-  // Exit superposition if the correct ghost was clicked
-  if (collapsed) {
-    ghostBalls = [];
-    inSuperposition = false;
-    score++;
-    randomizeBallPosition(redBall);
-    displayFact();
-  }
-}
-
 // Randomize ball position
 function randomizeBallPosition(ball) {
   ball.x = Math.random() * (canvas.width - 2 * ball.radius) + ball.radius;
   ball.y = Math.random() * (canvas.height - 2 * ball.radius) + ball.radius;
 }
 
-// Add quantum uncertainty to balls
-function quantumUncertainty(ball) {
-  ball.x += Math.random() * 6 - 3;
-  ball.y += Math.random() * 6 - 3;
-  ball.x = Math.max(ball.radius, Math.min(canvas.width - ball.radius, ball.x));
-  ball.y = Math.max(ball.radius, Math.min(canvas.height - ball.radius, ball.y));
+// Celebration animation for 100 clicks
+function playCelebration() {
+  inCelebration = true;
+  let progress = 0;
+
+  // Animation loop
+  const animation = setInterval(() => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Fade-in red background
+    if (progress < 100) {
+      ctx.fillStyle = `rgba(255, 0, 0, ${progress / 100})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Display ASCII cats
+    if (progress >= 20 && progress <= 80) {
+      ctx.font = "20px monospace";
+      ctx.fillStyle = "black";
+      ctx.fillText("(=＾ᆺ＾=)", 100, 180); // Cat with wide eyes
+      ctx.fillText("(=xᆺx=)", 250, 180); // Cat with "X" eyes
+    }
+
+    // Random light show or fireworks
+    if (progress > 50) {
+      for (let i = 0; i < 10; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const size = Math.random() * 5 + 5;
+        ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
+          Math.random() * 255
+        }, 1)`;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    progress++;
+
+    if (progress > 100) {
+      clearInterval(animation);
+      inCelebration = false; // End celebration
+    }
+  }, 60); // Approx. 6 seconds for 100 steps (60ms each)
 }
 
 // Handle canvas click
 canvas.addEventListener("click", (e) => {
+  if (inCelebration) return; // Ignore clicks during celebration
+
   const dist = Math.sqrt(
     (e.offsetX - redBall.x) ** 2 + (e.offsetY - redBall.y) ** 2
   );
 
-  if (inSuperposition) {
-    collapseSuperposition(e.offsetX, e.offsetY);
-  } else if (dist <= redBall.radius) {
+  if (dist <= redBall.radius) {
     score++;
+    randomizeBallPosition(redBall);
+    displayFact();
+
+    // Trigger celebration at 100 clicks
+    if (score === 100) {
+      playCelebration();
+    }
+
     if (score % 10 === 0) {
       level++;
       message = "Keep clicking!";
@@ -106,10 +110,6 @@ canvas.addEventListener("click", (e) => {
 
     if (level >= 3) {
       blackBall.color = Math.random() < 0.25 ? "green" : "black";
-    }
-
-    if (level >= 2 && !inSuperposition) {
-      enterSuperposition();
     }
   }
 });
@@ -131,23 +131,15 @@ function moveGreyBall() {
 
 // Render the game
 function draw() {
+  if (inCelebration) return; // Stop game rendering during celebration
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw ghost balls (superposition)
-  if (inSuperposition) {
-    ghostBalls.forEach((ghost) => {
-      ctx.fillStyle = ghost.color;
-      ctx.beginPath();
-      ctx.arc(ghost.x, ghost.y, ghost.radius, 0, Math.PI * 2);
-      ctx.fill();
-    });
-  } else {
-    // Draw red ball
-    ctx.fillStyle = redBall.color;
-    ctx.beginPath();
-    ctx.arc(redBall.x, redBall.y, redBall.radius, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  // Draw red ball
+  ctx.fillStyle = redBall.color;
+  ctx.beginPath();
+  ctx.arc(redBall.x, redBall.y, redBall.radius, 0, Math.PI * 2);
+  ctx.fill();
 
   // Draw grey ball (level 2+)
   if (level >= 2) {
@@ -167,9 +159,6 @@ function draw() {
 
   // Update grey ball movement
   moveGreyBall();
-
-  // Add uncertainty
-  quantumUncertainty(redBall);
 
   // Update scoreboard and message
   scoreboardElement.textContent = `Score: ${score} | Level: ${level}`;
