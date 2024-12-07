@@ -130,7 +130,7 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-// Celebration animation at level 3 or after 10 clicks
+// Celebration animation
 function celebrate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
