@@ -54,8 +54,8 @@ canvas.addEventListener("click", (e) => {
     randomizeBallPosition(redBall);
     displayFact();
 
-    // Handle celebration after 10 clicks
-    if (score % 10 === 0) {
+    // Trigger celebration at level 2
+    if (level >= 2) {
       celebrate();
     }
 
