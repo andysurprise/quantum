@@ -55,7 +55,7 @@ canvas.addEventListener("click", (e) => {
     displayFact();
 
     // Trigger celebration at level 2
-    if (level >= 2) {
+    if (score % 10 === 0 && level >= 2) {
       celebrate();
     }
 
