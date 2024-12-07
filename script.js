@@ -132,6 +132,7 @@ function draw() {
 
 // Celebration animation
 function celebrate() {
+  console.log("Celebration started!"); // P9863
   let alpha = 0;
   const fadeInterval = setInterval(() => {
     alpha += 0.01;
