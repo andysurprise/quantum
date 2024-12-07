@@ -132,18 +132,39 @@ function draw() {
 
 // Celebration animation
 function celebrate() {
+  let alpha = 0;
+  const fadeInterval = setInterval(() => {
+    alpha += 0.01;
+    if (alpha >= 1) {
+      clearInterval(fadeInterval);
+      showCatsAndFireworks();
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = `rgba(255, 0, 0, ${alpha})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+  }, 60);
+}
+
+function showCatsAndFireworks() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw bright red screen
-  ctx.fillStyle = "red";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Draw cats with fireworks
-  ctx.font = "40px Arial";
+  // Draw detailed ASCII art cats
+  const cat1 = `
+    /\\_/\\  
+   ( o.o ) 
+    > ^ <  
+  `;
+  const cat2 = `
+    /\\_/\\  
+   ( x.x ) 
+    > ^ <  
+  `;
+  ctx.font = "20px Courier New";
   ctx.fillStyle = "white";
   ctx.textAlign = "center";
-  ctx.fillText("😺", canvas.width / 4, canvas.height / 2 - 30); // Wide-eyed cat
-  ctx.fillText("💥", 3 * canvas.width / 4, canvas.height / 2 - 30); // Exploding cat
+  ctx.fillText(cat1, canvas.width / 4, canvas.height / 2);
+  ctx.fillText(cat2, 3 * canvas.width / 4, canvas.height / 2);
 
   // Light show
   for (let i = 0; i < 50; i++) {
