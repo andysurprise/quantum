@@ -55,7 +55,7 @@ canvas.addEventListener("click", (e) => {
     displayFact();
 
     // Trigger celebration at level 2
-    if (score % 10 === 0 && level >= 2) {
+    if (score % 10 === 0) {
       celebrate();
     }
 
@@ -133,18 +133,7 @@ function draw() {
 // Celebration animation
 function celebrate() {
   console.log("Celebration started!"); // P9863
-  let alpha = 0;
-  const fadeInterval = setInterval(() => {
-    alpha += 0.01;
-    if (alpha >= 1) {
-      clearInterval(fadeInterval);
-      showCatsAndFireworks();
-    } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = `rgba(255, 0, 0, ${alpha})`;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-  }, 60);
+  showCatsAndFireworks();
 }
 
 function showCatsAndFireworks() {
