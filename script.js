@@ -125,15 +125,4 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-function hideIntroScreen() {
-  const introScreen = document.getElementById("introScreen");
-  introScreen.style.transition = "opacity 1s";
-  introScreen.style.opacity = 0;
-  setTimeout(() => {
-    introScreen.style.display = "none";
-  }, 1000);
-}
-
-setTimeout(hideIntroScreen, 5000);
-
 draw();
