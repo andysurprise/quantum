@@ -54,11 +54,6 @@ canvas.addEventListener("click", (e) => {
     randomizeBallPosition(redBall);
     displayFact();
 
-    // Trigger celebration at level 2
-    if (score % 10 === 0) {
-      celebrate();
-    }
-
     // Handle level transitions
     if (score % 10 === 0) {
       level++;
@@ -128,46 +123,6 @@ function draw() {
   messageElement.textContent = message;
 
   requestAnimationFrame(draw);
-}
-
-// Celebration animation
-function celebrate() {
-  console.log("Celebration started!"); // P9863
-  showCatsAndFireworks();
-}
-
-function showCatsAndFireworks() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Draw detailed ASCII art cats
-  const cat1 = `
-    /\\_/\\  
-   ( o.o ) 
-    > ^ <  
-  `;
-  const cat2 = `
-    /\\_/\\  
-   ( x.x ) 
-    > ^ <  
-  `;
-  ctx.font = "20px Courier New";
-  ctx.fillStyle = "white";
-  ctx.textAlign = "center";
-  ctx.fillText(cat1, canvas.width / 4, canvas.height / 2);
-  ctx.fillText(cat2, 3 * canvas.width / 4, canvas.height / 2);
-
-  // Light show
-  for (let i = 0; i < 50; i++) {
-    ctx.fillStyle = `hsl(${Math.random() * 360}, 100%, 50%)`;
-    ctx.beginPath();
-    ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 5 + 1, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Reset after 6 seconds
-  setTimeout(() => {
-    draw();
-  }, 6000);
 }
 
 draw();
